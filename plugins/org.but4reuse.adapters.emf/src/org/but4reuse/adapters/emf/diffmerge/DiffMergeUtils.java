@@ -40,7 +40,7 @@ public class DiffMergeUtils {
 		EObjectScopeDefinition right = new EObjectScopeDefinition(rightEObject, "right", true);
 		List<IComparisonMethodFactory> listcmf = getApplicableComparisonMethodFactories(leftEObject, rightEObject);
 		if (listcmf.isEmpty()) {
-			methods.add(new DefaultComparisonMethod(left, right, null));
+			methods.add(new DefaultComparisonMethod(left, right, null, null));
 		} else {
 			for (IComparisonMethodFactory factory : listcmf) {
 				methods.add(factory.createComparisonMethod(left, right, null));
