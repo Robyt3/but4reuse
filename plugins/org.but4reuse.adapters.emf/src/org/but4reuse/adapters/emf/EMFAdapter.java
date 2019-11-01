@@ -65,6 +65,9 @@ public class EMFAdapter implements IAdapter {
 		// First construction primitive is the Resource creation
 		List<IElement> elements = new ArrayList<IElement>();
 		EObject eObject = EMFUtils.getEObject(uri);
+		if(eObject == null) {
+			return elements;
+		}
 		EMFClassElement element = getEMFElementsFactory().createEMFClassElement();
 		element.isResource = true;
 		element.owner = null;
