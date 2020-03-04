@@ -8,9 +8,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.but4reuse.adaptedmodel.AdaptedModel;
 import org.but4reuse.feature.constraints.BasicExcludesConstraint;
@@ -89,12 +91,12 @@ public class FeatureIDEUtils {
 	public static void createConfiguration(URI configURI, List<String> features) throws IOException {
 		File configFile = FileUtils.getFile(configURI);
 		FileUtils.createFile(configFile);
-		BufferedWriter output = new BufferedWriter(new FileWriter(configFile));
-		for (String feature : features) {
-			output.append(validFeatureName(feature));
-			output.newLine();
+		try (BufferedWriter output = new BufferedWriter(new FileWriter(configFile))) {
+			for (String feature : features) {
+				output.append(validFeatureName(feature));
+				output.newLine();
+			}			
 		}
-		output.close();
 	}
 
 	/**
@@ -174,13 +176,20 @@ public class FeatureIDEUtils {
 	// 1 of 3 is true.
 	public static boolean isAncestorFeature1ofFeature2(FeatureModel fm, List<IConstraint> constraints, IFeature f1,
 			IFeature f2) {
+		return isAncestorFeature1ofFeature2(fm, constraints, f1, f2, new HashSet<IFeature>());
+	}
+
+	private static boolean isAncestorFeature1ofFeature2(FeatureModel fm, List<IConstraint> constraints, IFeature f1,
+			IFeature f2, Set<IFeature> seenFeatures) {
 		List<IFeature> directRequired = getFeatureRequiredFeatures(fm, constraints, f2);
 		if (directRequired.contains(f1)) {
 			return true;
 		}
 		for (IFeature direct : directRequired) {
-			if (isAncestorFeature1ofFeature2(fm, constraints, f1, direct)) {
-				return true;
+			if(seenFeatures.add(direct)) {
+				if (isAncestorFeature1ofFeature2(fm, constraints, f1, direct, seenFeatures)) {
+					return true;
+				}
 			}
 		}
 		return false;
